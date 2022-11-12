@@ -1,5 +1,5 @@
 import { html, LitElement } from 'https://cdn.jsdelivr.net/gh/lit/dist@2/all/lit-all.min.js'
-import { store } from '../store.js'
+import { connect } from '../store.js'
 
 class Component extends LitElement {
     static get properties() {
@@ -10,19 +10,14 @@ class Component extends LitElement {
 
     constructor() {
         super()
-        const state = store.subscribe(this.storeChange)
-        this.storeChange(state)
+
+        this.disconnectStore = connect((state) => {
+            if (this.phase === state.phase) return
+            this.phase = state.phase
+        })
     }
 
-    /**
-     * @param {import('../types').state} state 
-     */
-    storeChange = (state) => {
-        if (this.phase === state.phase) return
-        this.phase = state.phase
-    }
-
-    disconnectedCallback() { store.unsubscribe(this.storeChange) }
+    disconnectedCallback() { this.disconnectStore() }
 
     render() {
         switch (this.phase) {
