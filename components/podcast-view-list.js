@@ -1,4 +1,4 @@
-import { html, LitElement } from 'https://cdn.jsdelivr.net/gh/lit/dist@2/all/lit-all.min.js'
+import { html, LitElement, css } from 'https://cdn.jsdelivr.net/gh/lit/dist@2/all/lit-all.min.js'
 import { store } from '../store.js'
 
 class Component extends LitElement {
@@ -24,20 +24,33 @@ class Component extends LitElement {
 
     disconnectedCallback() { store.unsubscribe(this.storeChange) }
 
+    static styles = css`
+        li {
+            border: 1px solid var(--primary-blue);
+        }
+    `;
+
     render() {
         /**
          * @type {import('../types').preview[]}
          */
         const preview = this.previews
 
-        const list = preview.map(({ title }) => {
-            return html`<li>${title}</li>`
+        const list = preview.map(({ title, id }) => {
+            const clickHandler = () => store.loadSingle(id)
+
+            return html`
+                <li>
+                    <button @click="${clickHandler}">
+                        ${title}
+                    </button>
+                </li>
+            `
         })
 
         return html`
-            <ul>
-                ${list}
-            </ul>
+            <h1>Podcast List</h1>
+            <ul>${list}</ul>
         `
     }
 }
